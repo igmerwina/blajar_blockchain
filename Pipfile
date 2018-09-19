@@ -4,8 +4,11 @@ verify_ssl = true
 name = "pypi"
 
 [packages]
+yapf = "*"
 
 [dev-packages]
+pylint = "*"
+yapf = "*"
 
 [requires]
 python_version = "3.6"
