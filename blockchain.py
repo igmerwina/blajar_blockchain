@@ -8,14 +8,18 @@ def add_value(transaction_ammount, last_transaction=[1]):
     blockchain.append([last_transaction, transaction_ammount])
 
 
-tx_ammount=float(input('Your transaction ammount plesase: '))
+def get_user_input():
+    return float(input('Your transaction ammount please: '))
+
+
+tx_ammount=get_user_input()
 add_value(tx_ammount) # transaksi pertama  
 
-tx_ammount=float(input('Your transaction ammount plesase: '))
+tx_ammount=get_user_input()
 # transaksi sebelumnya , transaksi sekarang
 add_value(last_transaction=get_last_blockchain_value(), transaction_ammount=tx_ammount) 
 
-tx_ammount=float(input('Your transaction ammount plesase: '))
+tx_ammount=get_user_input()
 add_value(tx_ammount, get_last_blockchain_value()) 
 
 print(blockchain)
