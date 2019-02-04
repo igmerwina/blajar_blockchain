@@ -7,7 +7,7 @@ def get_last_blockchain_value():
     return blockchain[-1]  # index list paling awal
 
 
-def add_value(transaction_ammount, last_transaction=[1]):
+def add_value(transaction_ammount, last_transaction=[1]): # [1] = default value
     """ Append a new value as well as the last blockchain value to the blockchain 
     
     Argument:
@@ -15,7 +15,10 @@ def add_value(transaction_ammount, last_transaction=[1]):
         :last_transaction: The last blockchain transaction (default[1]).
     """
     # nambahin last_trx sama tx_ammount ke bc
+    # blockchainnya di appen oleh last trasaction sama tx_ammount
+    # last trasaction karena baru, jadi di isi [1] biar keisi dulu
     blockchain.append([last_transaction, transaction_ammount])
+    
 
 
 def get_user_input():
