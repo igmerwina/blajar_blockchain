@@ -1,4 +1,4 @@
-# initiate blockchain list
+# initiate empty blockchain list
 blockchain = []
 
 
@@ -45,11 +45,29 @@ def print_blockchain_elements():
         print(block)
 
 
-# loop the trasaction   
+def verify_chain():
+    # Blockchain looping logic for verification
+    block_index = 0 # inisiasi index block 
+    is_valid = True # helper variable buat ngecek apa bener last block ada di first block
+    for block in blockchain:
+        if block_index == 0: 
+            block_index += 1 # kalau block_index = 0, data +1
+            continue
+        if block[0] == blockchain[block_index - 1]:
+            is_valid = True # ngecek last block apa ada di first block
+        else: 
+            is_valid = False
+            break
+        block_index += 1
+    return is_valid 
+
+
+# Loop the trasaction   
 while True:
     print('\nPlease Choose')
     print('1. Add a new transaction value')
     print('2. Output the Blockchain Blocks')
+    print('h. Manipulate the chain')
     print('q. Quit')
     user_choice = get_user_choice()
     if user_choice == '1': 
@@ -57,10 +75,16 @@ while True:
         add_transaction(tx_ammount, get_last_blockchain_value())
     elif user_choice == '2': 
         print_blockchain_elements()
+    elif user_choice == 'h': 
+        # manipulate block
+        if len(blockchain) >1: 
+            blockchain[0] = [2]
     elif user_choice == 'q':
         break # 'break' quit the loop  
     else: 
         print('Input was invalid, please pick a value from the list!')
-    print('Choice registered!')
+    if not verify_chain():
+        print('Invalid Blockhain')
+        break
 
 print('Done!')
