@@ -4,10 +4,12 @@ blockchain = []
 
 def get_last_blockchain_value():
     """ Return the last value of the current blockchain. """
+    if len(blockchain) < 1:
+        return None
     return blockchain[-1]  # index list paling awal
 
 
-def add_value(transaction_ammount, last_transaction=[1]): # [1] = default value
+def add_transaction(transaction_ammount, last_transaction=[1]): # [1] = default value
     """ Append a new value as well as the last blockchain value to the blockchain 
     
     Argument:
@@ -17,26 +19,48 @@ def add_value(transaction_ammount, last_transaction=[1]): # [1] = default value
     # nambahin last_trx sama tx_ammount ke bc
     # blockchainnya di appen oleh last trasaction sama tx_ammount
     # last trasaction karena baru, jadi di isi [1] biar keisi dulu
+    if last_transaction == None: 
+        last_transaction = [1]
     blockchain.append([last_transaction, transaction_ammount])
     
 
 
-def get_user_input():
+def get_transaction_value():
     """ Returns the input of the user (a new transaction amount) as a float. """
     # input buat user masukin data ke bc
-    return float(input('Your transaction ammount please: '))
+    user_input = float(input('Your transaction ammount please: '))
+    return user_input
 
 
-tx_ammount = get_user_input()
-add_value(tx_ammount)  # transaksi pertama
+def get_user_choice():
+    # Choice for if else menu
+    user_input = input('Your Choice: ')
+    return user_input
 
-tx_ammount = get_user_input()
-# transaksi sebelumnya , transaksi sekarang
-add_value(
-    last_transaction=get_last_blockchain_value(),
-    transaction_ammount=tx_ammount)
 
-tx_ammount = get_user_input()
-add_value(tx_ammount, get_last_blockchain_value())
+def print_blockchain_elements():
+    # Output blockchain to the console
+    for block in blockchain:
+        print('Outputing Block')
+        print(block)
 
-print(blockchain)
+
+# loop the trasaction   
+while True:
+    print('\nPlease Choose')
+    print('1. Add a new transaction value')
+    print('2. Output the Blockchain Blocks')
+    print('q. Quit')
+    user_choice = get_user_choice()
+    if user_choice == '1': 
+        tx_ammount = get_transaction_value()
+        add_transaction(tx_ammount, get_last_blockchain_value())
+    elif user_choice == '2': 
+        print_blockchain_elements()
+    elif user_choice == 'q':
+        break # 'break' quit the loop  
+    else: 
+        print('Input was invalid, please pick a value from the list!')
+    print('Choice registered!')
+
+print('Done!')
