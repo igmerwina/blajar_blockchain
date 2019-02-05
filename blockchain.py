@@ -1,4 +1,9 @@
 # initiate empty blockchain list
+genesis_block = {
+    'previous_hash': '', 
+    'index': 0, # index ini optional. metadata, dan bebas
+    'transactions': []
+}
 blockchain = []
 open_transaction = []
 owner = 'Max'
@@ -11,7 +16,7 @@ def get_last_blockchain_value():
     return blockchain[-1]  # index list paling awal
 
 
-def add_transaction(recipient, sender=owner, amount=1.0): 
+def add_transaction(recipient, sender=owner, amount=1.0):
     """ Append a new value as well as the last blockchain value to the blockchain 
     
     Argument:
@@ -19,25 +24,29 @@ def add_transaction(recipient, sender=owner, amount=1.0):
         :recipient: The recipient of the Coins.
         :amount: The amount of coins sent with the transaction (default=1.0)
     """
-    transaction = {
-        'sender': sender, 
-        'recipient': recipient, 
-        'amount': amount
-    }
-    open_transaction.append(transaction) # data di transaction dimasukin ke open_transaction
+    transaction = {'sender': sender, 'recipient': recipient, 'amount': amount}
+    open_transaction.append(
+        transaction)  # data di transaction dimasukin ke open_transaction
 
 
 def mine_block():
-    pass
+    last_block = blockchain[-1]
+    block = {
+        'previous_hash': 'XYZ', 
+        'index': len(blockchain), # index ini optional. metadata, dan bebas
+        'transactions': open_transaction
+    }
+    blockchain.append(block)
+
 
 def get_transaction_value():
     """ Returns the input of the user (a new transaction amount) as a float. """
     # input buat user masukin data ke bc
     tx_recipient = input('Enter the recipient of the transaction: ')
     tx_amount = float(input('Your transaction amount please: '))
-    return tx_recipient, tx_amount # tuples
+    return tx_recipient, tx_amount  # tuples
 
- 
+
 def get_user_choice():
     # Choice for if else menu
     user_input = input('Your Choice: ')
@@ -79,7 +88,7 @@ while waiting_for_input:
     user_choice = get_user_choice()
     if user_choice == '1':
         tx_data = get_transaction_value()
-        recipient, amount = tx_data # extract tuple >> tx_data
+        recipient, amount = tx_data  # extract tuple >> tx_data
         # add transaction amount to the blockchain
         add_transaction(recipient, amount=amount)
         print(open_transaction)
