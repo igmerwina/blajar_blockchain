@@ -8,11 +8,29 @@ genesis_block = {
 blockchain = [genesis_block]
 open_transaction = []
 owner = 'Max'
-participants = {'Max'}  
+participants = {'Max'}  # a set of participant, nambah otomatis selain max 
 
 
 def hash_block(block):
     return '-'.join([str(block[key]) for key in block])  # list comprehension:
+
+
+def get_balance(participant):
+    # get balannce sender
+    # masih kurang paham sama comprehension yang di bawah ini:
+    tx_sender = [[tx['amount'] for tx in block['transactions'] if tx['sender'] == participant] for block in blockchain]
+    amount_sent = 0 
+    for tx in tx_sender:
+        if len(tx) > 0:    
+            amount_sent += tx[0]
+    
+    # get balance recipient 
+    tx_recipient = [[tx['amount'] for tx in block['transactions'] if tx['recipient'] == participant] for block in blockchain]
+    amount_received = 0 
+    for tx in tx_recipient:
+        if len(tx) > 0:    
+            amount_received += tx[0]
+    return amount_received - amount_sent
 
 
 def get_last_blockchain_value():
@@ -30,25 +48,26 @@ def add_transaction(recipient, sender=owner, amount=1.0):
         :recipient: The recipient of the Coins.
         :amount: The amount of coins sent with the transaction (default=1.0)
     """
-    transaction = {'sender': sender, 'recipient': recipient, 'amount': amount}
+    transaction = {
+        'sender': sender, 
+        'recipient': recipient, 
+        'amount': amount
+    }
     open_transaction.append(transaction)  # data di transaction dimasukin ke open_transaction
-    participants.add(sender)
+    participants.add(sender) # add
     participants.add(recipient)
 
 
 def mine_block():
     last_block = blockchain[-1]
     hashed_block = hash_block(last_block)
-    print('new block mined! \n')
-
     block = {
         'previous_hash': hashed_block,
-        'index': len(
-            blockchain
-        ),  # index ini optional. mrupakan metadata blockchain, dan bebas isinya
+        'index': len(blockchain),  # index ini optional. mrupakan metadata blockchain, dan bebas isinya
         'transactions': open_transaction
     }
     blockchain.append(block)
+    return True # reset open_transaction to empty list 
 
 
 def get_transaction_value():
@@ -101,9 +120,10 @@ while waiting_for_input:
         recipient, amount = tx_data  # extract tuple >> tx_data
         # add transaction amount to the blockchain
         add_transaction(recipient, amount=amount)
-        print(open_transaction)
+        # print(open_transaction)
     elif user_choice == '2':
-        mine_block()
+        if mine_block():
+            open_transaction = [] # reset open transaction 
     elif user_choice == '3':
         print_blockchain_elements()
     elif user_choice == '4':
@@ -112,10 +132,8 @@ while waiting_for_input:
         # manipulate block
         if len(blockchain) > 1:
             blockchain[0] = {  # dipakai buat hack verfication
-                'previous_hash':
-                '',
-                'index':
-                0,
+                'previous_hash': '',
+                'index': 0,
                 'transactions': [{
                     'sender': 'Christ',
                     'recipient': 'Max',
@@ -130,5 +148,6 @@ while waiting_for_input:
         print_blockchain_elements()
         print('Invalid Blockhain')
         break
+    print(get_balance('Max'))
 
 print('Done!')
