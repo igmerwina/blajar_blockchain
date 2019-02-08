@@ -8,7 +8,7 @@ genesis_block = {
 }
 
 blockchain = [genesis_block]
-open_transaction = []
+open_transactions = []
 owner = 'Max'
 participants = {'Max'}  # a set of participant, nambah otomatis selain max 
 
@@ -20,8 +20,10 @@ def hash_block(block):
 
 def get_balance(participant):
     # get balannce sender
-    # masih kurang paham sama comprehension yang di bawah ini:
+    # masih kurang paham sama list comprehension: tx_sender, open_tx_sender
     tx_sender = [[tx['amount'] for tx in block['transactions'] if tx['sender'] == participant] for block in blockchain]
+    open_tx_sender = [tx['amount'] for tx in open_transactions if tx['sender'] == participant]
+    tx_sender.append(open_tx_sender)
     amount_sent = 0 
     for tx in tx_sender:
         if len(tx) > 0:    
@@ -42,6 +44,12 @@ def get_last_blockchain_value():
     return blockchain[-1]  # index list paling awal
 
 
+def verify_transaction(transaction):
+    sender_balance = get_balance(transaction['sender'])
+    return sender_balance >= transaction['amount']
+
+
+
 def add_transaction(recipient, sender=owner, amount=1.0):
     """ Append a new value as well as the last blockchain value to the blockchain 
     
@@ -55,9 +63,12 @@ def add_transaction(recipient, sender=owner, amount=1.0):
         'recipient': recipient, 
         'amount': amount
     }
-    open_transaction.append(transaction)  # data di transaction dimasukin ke open_transaction
-    participants.add(sender) # add
-    participants.add(recipient)
+    if verify_transaction(transaction):
+        open_transactions.append(transaction)  # data di transaction dimasukin ke open_transactions
+        participants.add(sender) # add
+        participants.add(recipient)
+        return True
+    return False
 
 
 def mine_block():
@@ -68,14 +79,14 @@ def mine_block():
         'recipient': owner,
         'amount': MINING_REWARD
     } 
-    open_transaction.append(reward_transaction) # append bakal nambah uangnya sendiri
+    open_transactions.append(reward_transaction) # append bakal nambah uangnya sendiri
     block = {
         'previous_hash': hashed_block,
         'index': len(blockchain),  # index ini optional. mrupakan metadata blockchain, dan bebas isinya
-        'transactions': open_transaction
+        'transactions': open_transactions
     }
     blockchain.append(block)
-    return True # reset open_transaction to empty list 
+    return True # reset open_transactions to empty list 
 
 
 def get_transaction_value():
@@ -127,11 +138,14 @@ while waiting_for_input:
         tx_data = get_transaction_value()
         recipient, amount = tx_data  # extract tuple >> tx_data
         # add transaction amount to the blockchain
-        add_transaction(recipient, amount=amount)
-        # print(open_transaction)
+        if add_transaction(recipient, amount=amount): 
+            print('Added Transaction!')
+        else: 
+            print('Transaction Failed!')
+        print(open_transactions)
     elif user_choice == '2':
         if mine_block():
-            open_transaction = [] # reset open transaction 
+            open_transactions = [] # reset open transaction 
     elif user_choice == '3':
         print_blockchain_elements()
     elif user_choice == '4':
