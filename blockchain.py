@@ -186,6 +186,7 @@ while waiting_for_input:
         print_blockchain_elements()
         print('Invalid Blockhain')
         break
-    print(get_balance('Max'))
+    # string formating pake {} sama .format | soo cooooll
+    print('Balance of {}: {:6.2f}'.format('Max', get_balance('Max')))
 
 print('Done!')
