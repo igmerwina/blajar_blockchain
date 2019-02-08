@@ -1,12 +1,19 @@
-# initiate empty blockchain list
+# genesis block yakni bc yg pertama kali dibuat
 genesis_block = {
-    'previous_hash': '', 
-    'index': 0, # index ini optional. metadata, dan bebas
+    'previous_hash': '',
+    'index': 0,  # index ini optional. metadata, dan bebas
     'transactions': []
 }
+
 blockchain = [genesis_block]
+
 open_transaction = []
+
 owner = 'Max'
+
+
+def hash_block(block):
+    return '-'.join([str(block[key]) for key in block])  # list comprehension:
 
 
 def get_last_blockchain_value():
@@ -31,14 +38,14 @@ def add_transaction(recipient, sender=owner, amount=1.0):
 
 def mine_block():
     last_block = blockchain[-1]
-
-    # list comprehension:
-    hashed_block = '-'.join([str(last_block[key]) for key in last_block])
-    print(hashed_block)
+    hashed_block = hash_block(last_block)
+    print('new block mined! \n')
 
     block = {
-        'previous_hash': hashed_block, 
-        'index': len(blockchain), # index ini optional. mrupakan metadata blockchain, dan bebas isinya
+        'previous_hash': hashed_block,
+        'index': len(
+            blockchain
+        ),  # index ini optional. mrupakan metadata blockchain, dan bebas isinya
         'transactions': open_transaction
     }
     blockchain.append(block)
@@ -68,17 +75,13 @@ def print_blockchain_elements():
 
 
 def verify_chain():
-    # Blockchain looping logic for verification
-    is_valid = True  # helper variable buat ngecek apa bener last block ada di first block
-    for block_index in range(len(blockchain)):
-        if block_index == 0:
+    """ Verify the current Bockchain and return True if it's valid, False if not"""
+    for (index, block) in enumerate(blockchain):
+        if index == 0:
             continue
-        elif blockchain[block_index][0] == blockchain[block_index - 1]:
-            is_valid = True  # ngecek last block apa ada di first block
-        else:
-            is_valid = False
-            break
-    return is_valid
+        if block['previous_hash'] != hash_block(blockchain[index - 1]):
+            return False
+    return True
 
 
 waiting_for_input = True
@@ -105,14 +108,24 @@ while waiting_for_input:
     elif user_choice == 'h':
         # manipulate block
         if len(blockchain) > 1:
-            blockchain[0] = [2]
+            blockchain[0] = {  # dipakai buat hack verfication
+                'previous_hash':
+                '',
+                'index':
+                0,
+                'transactions': [{
+                    'sender': 'Christ',
+                    'recipient': 'Max',
+                    'amount': 100
+                }]
+            }
     elif user_choice == 'q':
         waiting_for_input = False
     else:
         print('Input was invalid, please pick a value from the list!')
-    # if not verify_chain():
-    #     print_blockchain_elements()
-    #     print('Invalid Blockhain')
-    #     break
+    if not verify_chain():
+        print_blockchain_elements()
+        print('Invalid Blockhain')
+        break
 
 print('Done!')
