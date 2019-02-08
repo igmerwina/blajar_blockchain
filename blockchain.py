@@ -61,10 +61,13 @@ def add_transaction(recipient, sender=owner, amount=1.0):
         :recipient: The recipient of the Coins.
         :amount: The amount of coins sent with the transaction (default=1.0)
     """
-    transaction = {'sender': sender, 'recipient': recipient, 'amount': amount}
+    transaction = {
+        'sender': sender, 
+        'recipient': recipient, 
+        'amount': amount
+    }
     if verify_transaction(transaction):
-        open_transactions.append(
-            transaction)  # data di transaction dimasukin ke open_transactions
+        open_transactions.append(transaction)  # data di transaction dimasukin ke open_transactions
         participants.add(sender)  # add
         participants.add(recipient)
         return True
@@ -123,6 +126,11 @@ def verify_chain():
     return True
 
 
+def verify_transactions():
+    # all buat ngecek semua transaksi valid atau ngga
+    # list comprehension nya ngasilin True or False Only
+    return all([verify_transaction(tx) for tx in open_transactions])
+
 waiting_for_input = True
 
 # Loop the trasaction
@@ -132,6 +140,7 @@ while waiting_for_input:
     print('2. Mine a new Block')
     print('3. Output the Blockchain Blocks')
     print('4. Output participants')
+    print('5. Check transaction validity')
     print('h. Manipulate the chain')
     print('q. Quit')
 
@@ -152,6 +161,11 @@ while waiting_for_input:
         print_blockchain_elements()
     elif user_choice == '4':
         print(participants)
+    elif user_choice == '5':
+        if verify_transactions():
+            print('Transaction is Valid')
+        else: 
+            print('There are invalid transactions!')
     elif user_choice == 'h':
         # manipulate block
         if len(blockchain) > 1:
