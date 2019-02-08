@@ -1,3 +1,5 @@
+import functools
+
 # genesis block yakni bc yg pertama kali dibuat
 MINING_REWARD = 10  # reward untuk miner
 
@@ -25,19 +27,13 @@ def get_balance(participant):
         tx['amount'] for tx in block['transactions'] if tx['sender'] == participant] for block in blockchain]
     open_tx_sender = [tx['amount'] for tx in open_transactions if tx['sender'] == participant]
     tx_sender.append(open_tx_sender)
-    amount_sent = 0
-    for tx in tx_sender:
-        if len(tx) > 0:
-            amount_sent += tx[0]
+    amount_sent = functools.reduce(lambda tx_sum, tx_amt: tx_sum + tx_amt[0] if len(tx_amt) > 0 else 0, tx_sender, 0)
+    
     # get balance recipient
-    tx_recipient = [[
-        tx['amount'] for tx in block['transactions']
-        if tx['recipient'] == participant
-    ] for block in blockchain]
-    amount_received = 0
-    for tx in tx_recipient:
-        if len(tx) > 0:
-            amount_received += tx[0]
+    tx_recipient = [[tx['amount'] for tx in block['transactions'] if tx['recipient'] == participant] for block in blockchain]
+    amount_received = functools.reduce(lambda tx_sum, tx_amt: tx_sum + tx_amt[0] if len(tx_amt) > 0 else 0, tx_recipient , 0)
+
+    # return total balance
     return amount_received - amount_sent
 
 
