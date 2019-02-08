@@ -1,4 +1,6 @@
 # genesis block yakni bc yg pertama kali dibuat
+MINING_REWARD  = 10 # reward untuk miner 
+
 genesis_block = {
     'previous_hash': '',
     'index': 0,  # index ini optional. metadata, dan bebas
@@ -12,7 +14,8 @@ participants = {'Max'}  # a set of participant, nambah otomatis selain max
 
 
 def hash_block(block):
-    return '-'.join([str(block[key]) for key in block])  # list comprehension:
+    """ Hash pada Block """
+    return '-'.join([str(block[key]) for key in block])  # list comprehension
 
 
 def get_balance(participant):
@@ -23,7 +26,6 @@ def get_balance(participant):
     for tx in tx_sender:
         if len(tx) > 0:    
             amount_sent += tx[0]
-    
     # get balance recipient 
     tx_recipient = [[tx['amount'] for tx in block['transactions'] if tx['recipient'] == participant] for block in blockchain]
     amount_received = 0 
@@ -61,6 +63,12 @@ def add_transaction(recipient, sender=owner, amount=1.0):
 def mine_block():
     last_block = blockchain[-1]
     hashed_block = hash_block(last_block)
+    reward_transaction = { # reward for mining
+        'sender': 'MINING',
+        'recipient': owner,
+        'amount': MINING_REWARD
+    } 
+    open_transaction.append(reward_transaction) # append bakal nambah uangnya sendiri
     block = {
         'previous_hash': hashed_block,
         'index': len(blockchain),  # index ini optional. mrupakan metadata blockchain, dan bebas isinya
