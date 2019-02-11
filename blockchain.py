@@ -9,13 +9,19 @@ MINING_REWARD = 10  # reward untuk miner
 genesis_block = {
     'previous_hash': '',
     'index': 0,  # index ini optional. metadata, dan bebas
-    'transactions': []
+    'transactions': [],
+    'proof': 100
 }
 
+# Initializing our (empty) blockchain list
 blockchain = [genesis_block]
+# Unhandled transactions
 open_transactions = []
+# We are the owner of the Blockchain node. Hence this is our identifier
 owner = 'Max'
-participants = {'Max'}  # a set of participant, nambah otomatis selain max
+# A set of participant, nambah otomatis selain max
+# Registered participants: Ourself + other people sending/receiving coins
+participants = {'Max'}  
 
 
 def hash_block(block):
@@ -29,7 +35,7 @@ def hash_block(block):
 
 
 def valid_proof(transactions, lats_hash, proof):
-    guess = str(transactions) + str(lats_hash) + str(proof).encode()
+    guess = (str(transactions) + str(lats_hash) + str(proof)).encode()
     guess_hash = hl.sha256(guess).hexdigest()
     print(guess_hash)
     # kode buat ngecek bener/ngga kalau PoW nya 00 dari [0:2]
@@ -42,8 +48,8 @@ def proof_of_work():
     last_hash = hash_block(last_block)
     proof = 0 
     # ngecek apakah hash dari guess_hash uda terpenuhi
-    while valid_proof(open_transactions, last_hash, proof):
-        proof + 1
+    while not valid_proof(open_transactions, last_hash, proof):
+        proof += 1
     # ngecek nilai proof nya berapa
     return proof
 
@@ -100,20 +106,24 @@ def add_transaction(recipient, sender=owner, amount=1.0):
 
 
 def mine_block():
+    """ Create new block & add open transaction to it"""
+    # Get last block of the Blockchain
     last_block = blockchain[-1]
     hashed_block = hash_block(last_block)
-    print(hashed_block)
+    # Calculate the PoW
+    proof = proof_of_work()
     reward_transaction = {  # reward for mining
         'sender': 'MINING',
         'recipient': owner,
         'amount': MINING_REWARD
-    }
+    } 
     copied_transactions = open_transactions[:] # copy using range selector
     copied_transactions.append(reward_transaction)  # append bakal nambah uangnya sendiri
     block = {
         'previous_hash': hashed_block,
         'index': len(blockchain),  # index ini optional. mrupakan metadata blockchain, dan bebas isinya
-        'transactions': copied_transactions
+        'transactions': copied_transactions,
+        'proof': proof
     }
     blockchain.append(block)
     return True  # reset open_transactions to empty list
@@ -149,6 +159,9 @@ def verify_chain():
             continue
         if block['previous_hash'] != hash_block(blockchain[index - 1]):
             return False
+        if not valid_proof(block['transactions'][:-1], block['previous_hash'], block['proof']):
+            print('Proof Of Work is Invalid')
+            return False 
     return True
 
 
