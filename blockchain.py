@@ -1,7 +1,8 @@
 import functools
 import hashlib as hl
-import json
 from collections import OrderedDict
+
+from hash_util import hash_string_256, hash_block
 
 # reward mining for miners 
 MINING_REWARD = 10  # reward untuk miner
@@ -25,19 +26,9 @@ owner = 'Max'
 participants = {'Max'}  
 
 
-def hash_block(block):
-    """ Hash pada Block. Renturn string representation of it 
-    
-    Arguments: 
-        :block: The block that should be hashed
-    """
-    # pakai SHA256 buat bkin hash | .hexdigest --> ngubah data hash (byte) jadi string
-    return hl.sha256(json.dumps(block, sort_keys=True).encode()).hexdigest( )
-
-
 def valid_proof(transactions, lats_hash, proof):
     guess = (str(transactions) + str(lats_hash) + str(proof)).encode()
-    guess_hash = hl.sha256(guess).hexdigest()
+    guess_hash = hash_string_256(guess)
     print(guess_hash)
     # kode buat ngecek bener/ngga kalau PoW nya 00 dari [0:2]
     # merupakan syarat dari while di valid_proof di bawah
