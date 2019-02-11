@@ -1,6 +1,7 @@
 import functools
 import hashlib as hl
 import json
+from collections import OrderedDict
 
 # reward mining for miners 
 MINING_REWARD = 10  # reward untuk miner
@@ -31,7 +32,7 @@ def hash_block(block):
         :block: The block that should be hashed
     """
     # pakai SHA256 buat bkin hash | .hexdigest --> ngubah data hash (byte) jadi string
-    return hl.sha256(json.dumps(block).encode()).hexdigest( )
+    return hl.sha256(json.dumps(block, sort_keys=True).encode()).hexdigest( )
 
 
 def valid_proof(transactions, lats_hash, proof):
@@ -52,7 +53,6 @@ def proof_of_work():
         proof += 1
     # ngecek nilai proof nya berapa
     return proof
-
 
 
 def get_balance(participant):
@@ -92,11 +92,14 @@ def add_transaction(recipient, sender=owner, amount=1.0):
         :recipient: The recipient of the Coins.
         :amount: The amount of coins sent with the transaction (default=1.0)
     """
-    transaction = {
-        'sender': sender, 
-        'recipient': recipient, 
-        'amount': amount
-    }
+    # transaction = {
+    #     'sender': sender, 
+    # 'recipient': recipient, 
+    # 'amount': amount
+    # }
+    transaction = OrderedDict(
+        [('sender', sender), ('recipient', recipient), ('amount', amount)]
+    )
     if verify_transaction(transaction):
         open_transactions.append(transaction)  # data di transaction dimasukin ke open_transactions
         participants.add(sender)  # add
@@ -112,11 +115,14 @@ def mine_block():
     hashed_block = hash_block(last_block)
     # Calculate the PoW
     proof = proof_of_work()
-    reward_transaction = {  # reward for mining
-        'sender': 'MINING',
-        'recipient': owner,
-        'amount': MINING_REWARD
-    } 
+    # reward_transaction = {  # reward for mining
+    #     'sender': 'MINING',
+    #     'recipient': owner,
+    #     'amount': MINING_REWARD
+    # } 
+    reward_transaction = OrderedDict(
+        [('sender', 'MINING'), ('recipient', owner,), ('amount', MINING_REWARD)]
+    )
     copied_transactions = open_transactions[:] # copy using range selector
     copied_transactions.append(reward_transaction)  # append bakal nambah uangnya sendiri
     block = {
@@ -227,5 +233,7 @@ while waiting_for_input:
         break
     # string formating pake {} sama .format | soo cooooll
     print('Balance of {}: {:6.2f}'.format('Max', get_balance('Max')))
+else:
+    print('User left!')
 
 print('Done!')
