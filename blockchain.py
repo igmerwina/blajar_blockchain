@@ -1,8 +1,11 @@
 import functools
+import hashlib
+import json
 
-# genesis block yakni bc yg pertama kali dibuat
+# reward mining for miners 
 MINING_REWARD = 10  # reward untuk miner
 
+# genesis block yakni bc yg pertama kali dibuat
 genesis_block = {
     'previous_hash': '',
     'index': 0,  # index ini optional. metadata, dan bebas
@@ -16,8 +19,13 @@ participants = {'Max'}  # a set of participant, nambah otomatis selain max
 
 
 def hash_block(block):
-    """ Hash pada Block """
-    return '-'.join([str(block[key]) for key in block])  # list comprehension
+    """ Hash pada Block. Renturn string representation of it 
+    
+    Arguments: 
+        :block: The block that should be hashed
+    """
+    # pakai SHA256 buat bkin hash | .hexdigest --> ngubah data hash (byte) jadi string
+    return hashlib.sha256(json.dumps(block).encode()).hexdigest( )
 
 
 def get_balance(participant):
@@ -73,6 +81,7 @@ def add_transaction(recipient, sender=owner, amount=1.0):
 def mine_block():
     last_block = blockchain[-1]
     hashed_block = hash_block(last_block)
+    print(hashed_block)
     reward_transaction = {  # reward for mining
         'sender': 'MINING',
         'recipient': owner,
